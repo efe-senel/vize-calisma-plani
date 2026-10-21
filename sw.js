@@ -1,6 +1,6 @@
 // Offline erişim: ilk ziyaret sırasında uygulama dosyalarını yerel önbelleğe kaydeder.
 const CACHE_NAME = 'vize-rotasi-v1';
-const FILES = ['./', './index.html', './manifest.webmanifest', './apple-touch-icon.png', './icon.svg'];
+const FILES = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(FILES)).then(() => self.skipWaiting()));
 });
