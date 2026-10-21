@@ -1,0 +1,25 @@
+{
+  "name": "Vize Rotası · 3 Haftalık Çalışma Planı",
+  "short_name": "Vize Rotası",
+  "description": "19 Ekim – 8 Kasım 2026 çalışma planı ve sınav odaklı tekrar takvimi",
+  "lang": "tr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f0e8",
+  "theme_color": "#174b3c",
+  "icons": [
+    {
+      "src": "./apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
