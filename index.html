@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#174b3c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Vize Rotası">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="./icon.svg">
+  <meta name="description" content="3 haftalık, yeni konularla birlikte ilerleyen vize çalışma planı">
+  <title>Vize Rotası · Çalışma Planım</title>
+  <style>
+    :root {
+      --ink: #15231f;
+      --muted: #65716d;
+      --paper: #f4f0e8;
+      --card: #fffdf8;
+      --line: #d9d5cb;
+      --green: #174b3c;
+      --lime: #c8f04b;
+      --orange: #ff7a45;
+      --blue: #6ec7d4;
+      --shadow: 0 18px 48px rgba(26, 46, 39, .09);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 0%, rgba(200, 240, 75, .20), transparent 28rem),
+        radial-gradient(circle at 100% 18%, rgba(110, 199, 212, .18), transparent 25rem),
+        var(--paper);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    button, textarea { font: inherit; }
+    button { color: inherit; }
+
+    .shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
+
+    header { padding: 38px 0 24px; }
+    .topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 800; letter-spacing: -.02em; }
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 11px;
+      color: var(--lime);
+      background: var(--green);
+      transform: rotate(-3deg);
+    }
+    .top-actions { display: flex; gap: 8px; }
+    .plain-button {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.55);
+      border-radius: 999px;
+      padding: 9px 14px;
+      cursor: pointer;
+    }
+    .plain-button:hover { background: white; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.55fr .8fr;
+      gap: 22px;
+      align-items: stretch;
+    }
+    .hero-copy, .progress-card {
+      border: 1px solid rgba(23,75,60,.12);
+      box-shadow: var(--shadow);
+      border-radius: 28px;
+    }
+    .hero-copy {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(28px, 5vw, 58px);
+      background: var(--green);
+      color: white;
+    }
+    .hero-copy::after {
+      content: "21";
+      position: absolute;
+      right: -8px;
+      bottom: -58px;
+      color: rgba(255,255,255,.065);
+      font-size: clamp(11rem, 23vw, 19rem);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -.1em;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+      color: var(--lime);
+      font-size: .78rem;
+      font-weight: 850;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 24px; height: 2px; background: currentColor; }
+    h1 {
+      position: relative;
+      z-index: 1;
+      max-width: 700px;
+      margin: 0;
+      font-size: clamp(2.55rem, 7vw, 5.8rem);
+      line-height: .92;
+      letter-spacing: -.07em;
+    }
+    .hero-copy p { position: relative; z-index: 1; max-width: 650px; margin: 24px 0 0; color: #dce7e2; font-size: 1.05rem; }
+
+    .progress-card {
+      padding: 28px;
+      background: var(--card);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .date-range { color: var(--muted); font-size: .88rem; font-weight: 700; }
+    .score { margin: 16px 0 4px; font-size: clamp(3.8rem, 9vw, 6.8rem); font-weight: 900; line-height: 1; letter-spacing: -.07em; }
+    .score span { font-size: .35em; color: var(--muted); letter-spacing: -.02em; }
+    .bar { height: 12px; margin: 20px 0 10px; overflow: hidden; border-radius: 99px; background: #e5e4dc; }
+    .bar > div { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--orange), var(--lime)); transition: width .35s ease; }
+    .micro { color: var(--muted); font-size: .86rem; }
+
+    main { padding: 16px 0 70px; }
+    .rule-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 12px 0 34px;
+    }
+    .rule {
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 19px;
+      background: rgba(255,253,248,.72);
+    }
+    .rule strong { display: block; font-size: 1.4rem; letter-spacing: -.04em; }
+    .rule small { color: var(--muted); }
+    .rule:nth-child(1) strong { color: var(--orange); }
+    .rule:nth-child(2) strong { color: var(--green); }
+    .rule:nth-child(3) strong { color: #287e8d; }
+
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+    h2 { margin: 0; font-size: clamp(1.7rem, 4vw, 2.7rem); letter-spacing: -.055em; }
+    .section-head p { margin: 0; color: var(--muted); }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 7px;
+      margin-bottom: 18px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,.48);
+    }
+    .tab {
+      border: 0;
+      border-radius: 13px;
+      padding: 13px 16px;
+      background: transparent;
+      cursor: pointer;
+      font-weight: 800;
+    }
+    .tab.active { color: white; background: var(--green); box-shadow: 0 8px 18px rgba(23,75,60,.18); }
+
+    .week { display: none; }
+    .week.active { display: block; animation: enter .24s ease; }
+    @keyframes enter { from { opacity: 0; transform: translateY(6px); } }
+    .week-intro {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 19px 22px;
+      margin-bottom: 14px;
+      border-left: 5px solid var(--lime);
+      border-radius: 4px 18px 18px 4px;
+      background: #e7edd9;
+    }
+    .week-intro strong { display: block; margin-bottom: 3px; }
+    .week-intro span { color: var(--muted); }
+
+    .days { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .day {
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 21px;
+      background: var(--card);
+      box-shadow: 0 9px 26px rgba(29, 48, 42, .045);
+    }
+    .day:last-child:nth-child(odd) { grid-column: 1 / -1; }
+    .day-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+    .day-name { font-size: 1.15rem; font-weight: 900; letter-spacing: -.025em; }
+    .day-date { color: var(--muted); font-size: .78rem; font-weight: 750; }
+    .task {
+      display: grid;
+      grid-template-columns: 22px 1fr auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 0;
+      border-top: 1px dashed var(--line);
+    }
+    .task:first-of-type { border-top: 0; }
+    .task input { width: 19px; height: 19px; margin: 2px 0 0; accent-color: var(--green); cursor: pointer; }
+    .task label { cursor: pointer; }
+    .task label b { display: block; font-size: .94rem; }
+    .task label span { display: block; margin-top: 2px; color: var(--muted); font-size: .83rem; }
+    .task.done label { opacity: .48; text-decoration: line-through; }
+    .duration { color: var(--green); background: #e7eee9; border-radius: 99px; padding: 3px 8px; font-size: .72rem; font-weight: 800; white-space: nowrap; }
+    .new-topic .duration { color: #814023; background: #ffe6da; }
+
+    .exam-schedule { padding: 22px; margin: 0 0 18px; border: 1px solid var(--line); border-radius: 21px; background: var(--card); }
+    .exam-schedule h3 { margin: 0 0 7px; font-size: 1.15rem; }
+    .exam-schedule > p { color: var(--muted); margin: 0 0 17px; font-size: .87rem; }
+    .exam-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .exam-field { display: flex; flex-direction: column; gap: 5px; font-size: .79rem; font-weight: 750; }
+    .exam-field input { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--line); color: var(--ink); background: white; font: inherit; }
+    .weekend-flex { border: 2px dashed #86a49a; background: #f7faf4; }
+    .weekend-flex .day-name { color: var(--green); }
+    .open-slot-note { color: var(--muted); font-size: .9rem; margin: 10px 0; }
+    .priority-output { margin: 12px 0 0; padding: 0 0 0 21px; }
+    .priority-output li { margin: 8px 0; }
+    .priority-output small { display: block; color: var(--muted); }
+    .weekend-footnote { margin: 12px 0 0; padding: 11px 13px; border-radius: 12px; background: #e7eee9; color: var(--green); font-size: .83rem; }
+    @media (max-width: 820px) { .exam-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 620px) { .exam-grid { grid-template-columns: 1fr; } }
+
+    .courses { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 16px 0 38px; }
+    .course {
+      min-height: 132px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--card);
+    }
+    .course-index { color: var(--orange); font-size: .72rem; font-weight: 900; letter-spacing: .1em; }
+    .course h3 { margin: 19px 0 4px; font-size: 1rem; line-height: 1.15; }
+    .course p { margin: 0; color: var(--muted); font-size: .78rem; }
+    .course.ready { background: var(--green); color: white; border-color: var(--green); }
+    .course.ready .course-index { color: var(--lime); }
+    .course.ready p { color: #c9d9d3; }
+
+    .notes-wrap { margin-top: 34px; }
+    .notes {
+      width: 100%;
+      min-height: 150px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 18px;
+      color: var(--ink);
+      background: rgba(255,253,248,.85);
+      outline: none;
+    }
+    .notes:focus { border-color: var(--green); box-shadow: 0 0 0 4px rgba(23,75,60,.08); }
+    footer { padding: 24px 0 40px; color: var(--muted); font-size: .8rem; text-align: center; }
+
+    @media (max-width: 820px) {
+      .hero { grid-template-columns: 1fr; }
+      .rule-grid { grid-template-columns: 1fr; }
+      .courses { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 620px) {
+      .shell { width: min(100% - 20px, 1180px); }
+      header { padding-top: 18px; }
+      .topline { margin-bottom: 18px; }
+      .brand span:last-child { display: none; }
+      .hero-copy, .progress-card { border-radius: 22px; }
+      .hero-copy { padding: 30px 24px; }
+      .days { grid-template-columns: 1fr; }
+      .day:last-child:nth-child(odd) { grid-column: auto; }
+      .tabs { grid-template-columns: 1fr; }
+      .courses { grid-template-columns: 1fr 1fr; }
+      .week-intro { flex-direction: column; gap: 4px; }
+      .task { grid-template-columns: 22px 1fr; }
+      .duration { grid-column: 2; justify-self: start; }
+    }
+    @media print {
+      body { background: white; }
+      .top-actions, .tabs, .notes-wrap, footer { display: none !important; }
+      .hero { grid-template-columns: 2fr 1fr; }
+      .hero-copy, .progress-card, .day, .course { box-shadow: none; }
+      .week { display: block !important; break-before: page; }
+      .week:first-of-type { break-before: auto; }
+      .days { grid-template-columns: 1fr 1fr; }
+      .day { break-inside: avoid; }
+      main { padding-bottom: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header class="shell">
+    <div class="topline">
+      <div class="brand"><span class="brand-mark">V3</span><span>Vize rotası</span></div>
+      <div class="top-actions">
+        <button class="plain-button" id="printBtn">Yazdır / PDF</button>
+        <button class="plain-button" id="resetBtn">İşaretleri sıfırla</button>
+      </div>
+    </div>
+    <div class="hero">
+      <section class="hero-copy">
+        <div class="eyebrow">3 hafta · 9 ders · yaşayan plan</div>
+        <h1>Yeni konu gelirken geride kalma.</h1>
+        <p>İlk iki haftada konuları ilerlet, son hafta eksiklerini tamamla. 7–8 Kasım’ı sınav tarihlerine göre esnek tekrar için ayır.</p>
+      </section>
+      <aside class="progress-card">
+        <div>
+          <div class="date-range">19 Ekim — 8 Kasım 2026</div>
+          <div class="score"><b id="progressValue">0</b><span>%</span></div>
+          <div>toplam ilerleme</div>
+        </div>
+        <div>
+          <div class="bar"><div id="progressBar"></div></div>
+          <div class="micro" id="progressText">Henüz görev tamamlanmadı.</div>
+        </div>
+      </aside>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="rule-grid" aria-label="Çalışma dağılımı">
+      <article class="rule"><strong>%50 yeni konu</strong><small>Derste işlenen konuyu aynı gün 45–60 dakika tekrar et.</small></article>
+      <article class="rule"><strong>%30 eski konu</strong><small>İlk haftalardan kalan konuları aktif hatırlamayla kapat.</small></article>
+      <article class="rule"><strong>%20 uygulama</strong><small>Kod, soru, laboratuvar veya kısa bir kendini sınama.</small></article>
+    </section>
+
+    <section aria-labelledby="dersler-baslik">
+      <div class="section-head">
+        <div><h2 id="dersler-baslik">Ders panosu</h2><p>İçeriği incelenen dersler koyu renkle gösterildi.</p></div>
+      </div>
+      <div class="courses">
+        <article class="course ready"><span class="course-index">01</span><h3>VTYS</h3><p>Ders 1–8 sunumları incelendi: VTYS ve veri modelleme temellerinden DDL/DML, tek ve çok tablolu sorgular, view, indeks, EXPLAIN, kullanıcı yönetimi, prosedür, fonksiyon ve trigger konularına kadar.</p></article>
+        <article class="course ready"><span class="course-index">02</span><h3>Dosya Organizasyonu</h3><p>Hafta 1–5 incelendi</p></article>
+        <article class="course ready"><span class="course-index">03</span><h3>İşletim Sistemleri</h3><p>Abraham Silberschatz, Peter Baer Galvin ve Greg Gagne, <i>Operating System Concepts</i>, 10. baskı (2018): vize kapsamı Bölüm 1–8, kitap s. 4–346. Bölüm başlıkları ve alt başlıkları içindekilerden kontrol edildi.</p></article>
+        <article class="course ready"><span class="course-index">04</span><h3>Kriptoloji</h3><p>7 PPTX, toplam 180 slayt incelendi. Temel kavramlar, klasik şifreler, Affine, sayılar teorisi, sonlu cisimler, ilkel elemanlar ve temel kriptanaliz.</p><details><summary>Kaynaklar ve slayt aralıkları (K1–K7)</summary><p>K1 · 1. hafta kriptolojiye giriş .pptx (28 slayt): temel kavramlar ve güvenlik amaçları 2–16, simetrik/asimetrik sistemler ve Diffie–Hellman 17–27.<br>K2 · 2. Hafta(Klasik Şifreleme Yöntemleri).pptx (20 slayt): Polybius 2–3, Vigenere 4–7, Hill ve matris tersi 8–19.<br>K3 · 2. hafta Affine Kriptosistem Sunumu.pptx (8 slayt): anahtar koşulu ve formüller 2–3, HI ve cryptology uygulamaları 4–8.<br>K4 · 3.hafta Sayılar Teorisison.pptx (44 slayt): bölünebilme, EBOB/EKOK, asal sayılar ve Euler φ 2–15, mertebe ve ilkel kök 16–20, Öklid ve ters 21–25, Fermat/Euler 26–31, cebirsel yapılar ve sorular 32–43.<br>K5 · 4. SONLU CİSİM.pptx (27 slayt): polinom halkaları 2–9, GF(p), GF(pⁿ), indirgenemez/ilkel polinom 10–15, toplama, çarpma, ters ve GF(2³)/GF(2⁴) örnekleri 16–26.<br>K6 · 5. Sonlu Cisimde İlkel Eleman.pptx (33 slayt): mertebe ve ilkel eleman 2–8, ilkel kök sayısı ve modüler örnekler/testler 9–32.<br>K7 · 7.TemelKriptanaliz.pptx (20 slayt): kaba kuvvet ve saldırı tipleri 2–6, frekans, digram/trigram 7–13, Türkçe Sezar örneği 14–20.</p></details></article>
+        <article class="course"><span class="course-index">05</span><h3>EDT-Lab</h3><p>Kaynak eklenecek</p></article>
+        <article class="course ready"><span class="course-index">06</span><h3>C# Programlama</h3><p>Hafta 1–5 incelendi</p></article>
+        <article class="course"><span class="course-index">07</span><h3>İnsan-Bilgisayar Etkileşimi</h3><p>Kaynak eklenecek</p></article>
+        <article class="course"><span class="course-index">08</span><h3>Bilgi İşlem Organizasyonu</h3><p>Kaynak eklenecek</p></article>
+        <article class="course"><span class="course-index">09</span><h3>Gömülü Sistem Tasarımı</h3><p>Kaynak eklenecek</p></article>
+      </div>
+    </section>
+
+<article class="rule" style="margin-bottom:24px"><strong>Kaynak inceleme notu · 21 Ekim 2026</strong><small>İşletim Sistemleri için projeye ekli Abraham Silberschatz, Peter Baer Galvin ve Greg Gagne, <i>Operating System Concepts</i>, 10. baskı (2018) kitabının içindekiler sayfaları incelendi; Bölüm 1–8’in başlıkları ve kitap sayfa aralıkları doğrulandı. Aşağıdaki görevler bu başlık ve aralıklara göre çalışma alıştırmalarıdır; kitabın tam metninden alıntı ya da çıkmış sınav sorusu değildir. isletim.pdf s. 1–4 ve isletimCKodu/1.c–6.c ile kopya.c önceki incelemede görülmüştü; PDF’nin s. 5–76’sı bu incelemede okunmadı. VTYS için projedeki Ders 1–8 sunumlarının tamamı incelendi; VTYS görevleri yalnızca bu sunumlarda doğrulanan konularla güncellendi. Gömülü_Sistem_Tasarımı.zip bulundu; HEIC fotoğrafları incelenmedi. Kriptoloji için yerel ders notları klasöründeki K1–K7 olarak listelenen 7 PPTX’in 180 slaytı metin ve görsel sayfa görünümü üzerinden incelendi. 21 ve 24 Ekim, 29 Ekim ve 4 Kasım görevleri bu kaynakların gerçek başlıklarına göre güncellendi. Bazı eski denklem nesneleri görüntülemede bozulduğundan okunamayan ifadeler doğrudan aktarılmadı; hesaplama alıştırmaları okunabilen tanım ve örneklerden hareketle hazırlandı. K7’nin 14–20. slaytlarındaki Sezar örneğinde şifreli metin, harf sayımı ve son çözüm satırları arasında tutarsızlıklar görüldü. Bu nedenle görevde harfler yeniden sayılacak ve frekans varsayımı tüm metni çözerek sınanacak; kısa metinde en sık şifreli harfin mutlaka A’ya karşılık geldiği kabul edilmeyecek. Genel Zₘ yapısı her m için cisim değildir; ilkel kök hesapları çarpımsal birimler grubunda, GF(2ⁿ) işlemleri belirtilen indirgenemez polinomla yapılacaktır. EDT-Lab, İnsan-Bilgisayar Etkileşimi ve Bilgi İşlem Organizasyonu için kullanılabilir kaynak belirlenemedi; görevleri korundu. C# ve Dosya Organizasyonu görevleri önceki plandan korundu; yeniden doğrulanmadı. Kesin sınav tarihleri kaynakta bulunmadığından eklenmedi; üçüncü hafta içindeki sınav takvimine kullanıcı tarafından girilebilir. 7–8 Kasım için sabit görevler kaldırıldı ve sınav tarihi sırasına göre öneri gösteren esnek tekrar alanları eklendi. VTYS Ders 7 ve Ders 8 çalışmaları hafta içine alındı. Sorular önerilen alıştırmalardır, çıkmış sınav sorusu değildir.</small></article>
+    <section aria-labelledby="plan-baslik">
+      <div class="section-head">
+        <div><h2 id="plan-baslik">21 günlük rota</h2><p>Her görevi bitirdikçe işaretle; ilerlemen cihazında saklanır.</p></div>
+      </div>
+      <nav class="tabs" aria-label="Hafta seçimi">
+        <button class="tab active" data-week="1">1. Hafta · Temel</button>
+        <button class="tab" data-week="2">2. Hafta · Pekiştirme</button>
+        <button class="tab" data-week="3">3. Hafta · Sınava göre tekrar</button>
+      </nav>
+
+      <div class="week active" data-panel="1">
+        <div class="week-intro"><div><strong>Ritmi kur</strong><span>Mevcut konuların ilk yarısını toparla.</span></div><span>19–25 Ekim</span></div>
+        <div class="days">
+          <article class="day"><div class="day-head"><span class="day-name">Pazartesi</span><span class="day-date">19 Ekim</span></div>
+            <div class="task new-topic"><input id="t01" type="checkbox"><label for="t01"><b>Bugünün yeni dersi</b><span>Notları düzenle, 5 maddelik özet çıkar.</span></label><span class="duration">45 dk</span></div>
+            <div class="task"><input id="t02" type="checkbox"><label for="t02"><b>C# · Hafta 1–2</b><span>Giriş/çıkış, döngüler, diziler ve metotlar.</span></label><span class="duration">75 dk</span></div>
+            <div class="task"><input id="t03" type="checkbox"><label for="t03"><b>VTYS · Ders 1 · VTYS temelleri ve bileşenleri</b><span>25 dk: veri tabanı ve VTYS tanımlarını, üç seviyeli mimariyi, VTYS’nin avantajlarını, türlerini ve ne zaman kullanılmaması gerektiğini çalış. 20 dk: DDL, sorgu işleyicisi, DML, veri tabanı yöneticisi, bellek ve hareket yöneticisini tek şemada göster. 15 dk: ACID’i havale örneğiyle açıkla ve 8 kavram sorusunu notsuz yanıtla.</span></label><span class="duration">60 dk</span></div>
+          </article>
+          <article class="day"><div class="day-head"><span class="day-name">Salı</span><span class="day-date">20 Ekim</span></div>
+            <div class="task new-topic"><input id="t04" type="checkbox"><label for="t04"><b>Bugünün yeni dersi</b><span>Aynı gün tekrar ve anlaşılmayanları işaretleme.</span></label><span class="duration">45 dk</span></div>
+            <div class="task"><input id="t05" type="checkbox"><label for="t05"><b>Dosya Org. · Hafta 1–2</b><span>Dosya tasarımı, disk, iz, sektör ve erişim maliyeti.</span></label><span class="duration">75 dk</span></div>
+            <div class="task"><input id="t06" type="checkbox"><label for="t06"><b>İşletim Sistemleri · Bölüm 1–2 (kitap s. 4–101)</b><span>25 dk: Bölüm 1’den OS görevleri, bilgisayar sistemi organizasyonu, interrupt ve sistem mimarisini oku (s. 4–46). 20 dk: Bölüm 2’den servisler, kullanıcı arayüzü, sistem çağrıları, linker/loader ve OS yapısını incele (s. 55–92). 15 dk: notları kapatıp donanım–OS–uygulama şeması çiz; 5 OS servisini ve 3 sistem çağrısı örneğini açıklayıp interrupt ile system call farkını yaz. Bölüm 1–2 alıştırmalarından iki soru seç.</span></label><span class="duration">60 dk</span></div>
+          </article>
+          <article class="day"><div class="day-head"><span class="day-name">Çarşamba</span><span class="day-date">21 Ekim</span></div>
+            <div class="task new-topic"><input id="t07" type="checkbox"><label for="t07"><b>Bugünün yeni dersi</b><span>Yeni konuyu kendi cümlelerinle anlat.</span></label><span class="duration">45 dk</span></div>
+            <div class="task"><input id="t08" type="checkbox"><label for="t08"><b>Kriptoloji · Giriş, klasik şifreler ve Affine</b><span>15 dk: K1 slayt 2–20’den kriptografi/kriptanaliz, gizlilik, bütünlük, kimlik denetimi ve inkâr edememeyi çalış; simetrik/asimetrik anahtarları karşılaştır. 20 dk: K2 slayt 2–19’dan 5×6 Türkçe Polybius tablosuyla DERYA’yı kodla; A=0…Z=25 ile Vigenere’de CRYPTOGRAPY ve XRP anahtarını kullan; Hill’de satır vektörü y=xK kuralıyla K=((11,8),(3,7)) için BI bloğunu şifrele. 25 dk: K3 slayt 2–8’den Affine E(x)=(ax+b) mod 26 ve D(y)=a⁻¹(y−b) mod 26 ile HI’ı (5,8), CRYPTOLOGY’yi (5,11) anahtarıyla şifreleyip geri çöz. 15 dk: notları kapat, formülleri ve EBOB(a,26)=1 koşulunu yaz; a=2’nin neden geçersiz olduğunu açıkla, hesaplarını slaytlarla karşılaştır.</span></label><span class="duration">75 dk</span></div>
+            <div class="task"><input id="t09" type="checkbox"><label for="t09"><b>Bilgi İşlem Organizasyonu</b><span>Kavram haritası hazırla.</span></label><span class="duration">60 dk</span></div>
+          </article>
+          <article class="day"><div class="day-head"><span class="day-name">Perşembe</span><span class="day-date">22 Ekim</span></div>
+            <div class="task new-topic"><input id="t10" type="checkbox"><label for="t10"><b>Bugünün yeni dersi</b><span>Ders sonrası hızlı tekrar.</span></label><span class="duration">45 dk</span></div>
+            <div class="task"><input id="t11" type="checkbox"><label for="t11"><b>EDT-Lab</b><span>Uygulamayı yeniden kur ve sonucu kaydet.</span></label><span class="duration">75 dk</span></div>
+            <div class="task"><input id="t12" type="checkbox"><label for="t12"><b>İnsan-Bilgisayar Etkileşimi</b><span>Temel ilkelerden soru-cevap kartları.</span></label><span class="duration">60 dk</span></div>
+          </article>
+          <article class="day"><div class="day-head"><span class="day-name">Cuma</span><span class="day-date">23 Ekim</span></div>
+            <div class="task new-topic"><input id="t13" type="checkbox"><label for="t13"><b>Haftanın yeni konuları</b><span>15 dakikalık üç hızlı geri çağırma turu.</span></label><span class="duration">45 dk</span></div>
+            <div class="task"><input id="t14" type="checkbox"><label for="t14"><b>C# uygulaması</b><span>Kahve siparişi veya sayı tahmin programını sıfırdan yaz.</span></label><span class="duration">90 dk</span></div>
+            <div class="task"><input id="t15" type="checkbox"><label for="t15"><b>VTYS · Ders 2–3 · E-R ve ilişkisel modele geçiş</b><span>15 dk: veri modellerini; varlık, nitelik, domain, ilişki, rol, 1:1, 1:N, N:M, varolma bağımlılığı, anahtar ve zayıf varlık kavramlarını tekrar et. 20 dk: küçük bir E-R çizelgesini tablolara dönüştür; PK/FK’leri ve zayıf varlık anahtarını işaretle. 10 dk: Ders 1’den 5 soruyu notsuz yanıtla ve dönüşüm hatalarını kaydet.</span></label><span class="duration">45 dk</span></div>
+          </article>
+          <article class="day"><div class="day-head"><span class="day-name">Cumartesi</span><span class="day-date">24 Ekim</span></div>
+            <div class="task"><input id="t16" type="checkbox"><label for="t16"><b>Dosya Org. · Hafta 3–4</b><span>Dosya işlemleri, kayıt biçimleri ve hashing.</span></label><span class="duration">90 dk</span></div>
+            <div class="task"><input id="t17" type="checkbox"><label for="t17"><b>Kriptoloji · Sayılar teorisi ve modüler ters</b><span>15 dk: K4 slayt 2–31’den bölünebilme, EBOB/EKOK, Euler φ, Öklid/genişletilmiş Öklid, Fermat ve Euler teoremlerini tekrar et. 40 dk: çözümler kapalıyken EBOB(540,168) ve Bézout katsayılarını, EKOK(8,12), 15⁻¹ mod 26, φ(144), 25⁵⁰ mod 144 ve 23³⁷ mod 5 sonuçlarını hesapla; her teorem için aralarında asallık/asal modül koşulunu kontrol et. 20 dk: notsuz biçimde tersin varlık koşulunu ve iki teoremi yaz; Z₄’te 2’nin neden tersi olmadığını, Z₅’in neden cisim olduğunu açıkla (K4 slayt 32–40). Hatalı iki işlemi yeniden çöz ve Affine’in ters koşuluyla ilişkilendir.</span></label><span class="duration">75 dk</span></div>
+            <div class="task"><input id="t18" type="checkbox"><label for="t18"><b>Eksik kapatma</b><span>Hafta içinde yarım kalan tek işi bitir.</span></label><span class="duration">45 dk</span></div>
+          </article>
+          <article class="day"><div class="day-head"><span class="day-name">Pazar</span><span class="day-date">25 Ekim</span></div>
+            <div class="task"><input id="t19" type="checkbox"><label for="t19"><b>Haftalık karma tekrar</b><span>Her dersten 10 dakika: notsuz anlatım.</span></label><span class="duration">80 dk</span></div>
+            <div class="task"><input id="t62" type="checkbox"><label for="t62"><b>Gömülü Sistem Tasarımı</b><span>Haftanın konusu, temel bileşenler ve kısa uygulama özeti.</span></label><span class="duration">60 dk</span></div>
+            <div class="task"><input id="t20" type="checkbox"><label for="t20"><b>Yeni hafta hazırlığı</b><span>Yeni yüklenen materyalleri kontrol et, dosyaları sırala.</span></label><span class="duration">30 dk</span></div>
+            <div class="task"><input id="t21" type="checkbox"><label for="t21"><b>Dinlenme</b><span>Akşamı boş bırak; uyku saatini koru.</span></label><span class="duration">zorunlu</span></div>
+          </article>
+        </div>
+      </div>
+
+      <div class="week" data-panel="2">
+        <div class="week-intro"><div><strong>Bağlantıları kur</strong><span>Yeni konularla eski konuları birlikte kullan.</span></div><span>26 Ekim–1 Kasım</span></div>
+        <div class="days">
+          <article class="day"><div class="day-head"><span class="day-name">Pazartesi</span><span class="day-date">26 Ekim</span></div>
+            <div class="task new-topic"><input id="t22" type="checkbox"><label for="t22"><b>Bugünün yeni dersi</b><span>Yeni konu özeti + 3 kontrol sorusu.</span></label><span class="duration">45 dk</span></div>
+            <div class="task"><input id="t23" type="checkbox"><label for="t23"><b>İşletim Sistemleri · Bölüm 3–5 (kitap s. 106–254)</b><span>25 dk: Bölüm 3’te süreç kavramı, süreç durumları, PCB, zamanlama ve süreç işlemlerini çalış (s. 106–123). 20 dk: IPC, paylaşımlı bellek ve mesaj aktarma yaklaşımlarını karşılaştır (s. 123–145). 20 dk: Bölüm 4’te thread modelleri ve çok çekirdekli programlamayı, Bölüm 5’te zamanlama ölçütleri ile FCFS/SJF/öncelik/RR algoritmalarını gözden geçir (s. 160–217). 10 dk: notsuz süreç durum diyagramı çiz ve verilen 3 kısa CPU burst tablosu için bekleme/turnaround sürelerini hesapla.</span></label><span class="duration">75 dk</span></div>
+            <div class="task"><input id="t24" type="checkbox"><label for="t24"><b>İnsan-Bilgisayar Etkileşimi</b><span>Kavramları gerçek arayüz örneklerine uygula.</span></label><span class="duration">60 dk</span></div>
+          </article>
+          <article class="day"><div class="day-head"><span class="day-name">Salı</span><span class="day-date">27 Ekim</span></div>
+            <div class="task new-topic"><input id="t25" type="checkbox"><label for="t25"><b>C# · yeni hafta konusu</b><span>Depoya eklenen kodu çalıştır, değiştir ve yeniden yaz.</span></label><span class="duration">60 dk</span></div>
+            <div class="task"><input id="t26" type="checkbox"><label for="t26"><b>C# · Hafta 4</b><span>Generic, List, HashSet, sınıflar, LINQ ve lambda.</span></label><span class="duration">90 dk</span></div>
+            <div class="task"><input id="t27" type="checkbox"><label for="t27"><b>Bilgi İşlem Organizasyonu</b><span>20 dakikalık test + yanlış analizi.</span></label><span class="duration">45 dk</span></div>
+          </article>
+          <article class="day"><div class="day-head"><span class="day-name">Çarşamba</span><span class="day-date">28 Ekim</span></div>
+            <div class="task new-topic"><input id="t28" type="checkbox"><label for="t28"><b>Dosya Org. · yeni hafta konusu</b><span>Yeni PDF'nin ana başlıklarını tek sayfaya indir.</span></label><span class="duration">60 dk</span></div>
+            <div class="task"><input id="t29" type="checkbox"><label for="t29"><b>Dosya Org. · Hafta 5</b><span>inode, bağlantılar, bitmap, superblock ve hesaplamalar.</span></label><span class="duration">90 dk</span></div>
+            <div class="task"><input id="t30" type="checkbox"><label for="t30"><b>VTYS · Ders 4 · MySQL DDL ve DML uygulaması</b><span>10 dk: şema, MySQL veri tipleri ve PRIMARY KEY, FOREIGN KEY, UNIQUE, NOT NULL, CHECK kısıtlamalarını gözden geçir. 25 dk: bir şema ile ilişkili iki tabloyu CREATE ile kur; ALTER ile sütun ekle ve ardından INSERT, UPDATE ve DELETE örnekleri çalıştır. 10 dk: DELETE, TRUNCATE ve DROP farklarını yaz; E-R modelindeki ilişkinin FK’ye doğru dönüştüğünü kontrol et.</span></label><span class="duration">45 dk</span></div>
+          </article>
+          <article class="day"><div class="day-head"><span class="day-name">Perşembe</span><span class="day-date">29 Ekim</span></div>
+            <div class="task new-topic"><input id="t31" type="checkbox"><label for="t31"><b>Bugünün yeni dersi</b><span>Notları temizle ve boşlukları tamamla.</span></label><span class="duration">45 dk</span></div>
+            <div class="task"><input id="t32" type="checkbox"><label for="t32"><b>Kriptoloji · Sonlu cisimler ve ilkel eleman</b><span>15 dk: K5 slayt 2–15’ten polinom halkası, indirgenemez polinom, GF(p) ve GF(pⁿ) ayrımını tekrar et. 30 dk: GF(2³)’te f(x)=x³+x+1 ile 8 elemanı polinom/bit biçiminde listele; (x²+x)+(x+1), (x²+x)(x²+x+1) ve x⁻¹ işlemlerini yap. GF(2⁴)’te f(x)=x⁴+x+1 için (x³+x²+1)(x³+1) çarpımını indirge (K5 slayt 16–26). 30 dk: K6 slayt 2–11 ve 24–28’den mod 7’de 2 ve 3’ün mertebelerini, tüm ilkel kökleri ve sayılarını bul; mod 25’te 2’yi 2¹⁰ ve 2⁴ testleriyle sına, φ(20) ile ilkel kök sayısını hesapla. 15 dk: notsuz olarak halka/cisim ve indirgenemez/ilkel polinom farkını açıkla; GF(2³) ile Z₈’in neden farklı olduğunu yaz ve tersleri çarparak doğrula.</span></label><span class="duration">90 dk</span></div>
+            <div class="task"><input id="t33" type="checkbox"><label for="t33"><b>EDT-Lab</b><span>Laboratuvarı yardım almadan tekrarla.</span></label><span class="duration">60 dk</span></div>
+          </article>
+          <article class="day"><div class="day-head"><span class="day-name">Cuma</span><span class="day-date">30 Ekim</span></div>
+            <div class="task new-topic"><input id="t34" type="checkbox"><label for="t34"><b>Yeni konuların haftalık turu</b><span>Her yeni konu için 3 soru üret.</span></label><span class="duration">60 dk</span></div>
+            <div class="task"><input id="t35" type="checkbox"><label for="t35"><b>C# · müzik listesi uygulaması</b><span>Hata kontrolleri, ekleme, silme ve arama.</span></label><span class="duration">90 dk</span></div>
+            <div class="task"><input id="t36" type="checkbox"><label for="t36"><b>İşletim Sistemleri · Bölüm 3–5 aktif hatırlama ve alıştırma</b><span>10 dk notsuz: süreç durumu geçişlerini, PCB’yi, thread ile sürecin farklarını ve IPC türlerini yaz. 20 dk: 3 zamanlama örneğinde FCFS, SJF ve Round Robin için Gantt şeması; bekleme ve turnaround süreleri çıkar. 10 dk: çok çekirdekli programlama ve thread modelleriyle ilgili 4 kısa soruyu yanıtla. 5 dk: kitap s. 154–155, 197 ve 251–253’teki alıştırmalardan seçtiğin soruları kontrol edip yanlışlarını not et.</span></label><span class="duration">45 dk</span></div>
+          </article>
+          <article class="day"><div class="day-head"><span class="day-name">Cumartesi</span><span class="day-date">31 Ekim</span></div>
+            <div class="task"><input id="t37" type="checkbox"><label for="t37"><b>En zayıf iki ders</b><span>Birinci derse 75, ikinci derse 75 dakika.</span></label><span class="duration">150 dk</span></div>
+            <div class="task"><input id="t63" type="checkbox"><label for="t63"><b>Gömülü Sistem Tasarımı</b><span>Yeni konu tekrarı, şema/kod inceleme ve 10 kontrol sorusu.</span></label><span class="duration">75 dk</span></div>
+            <div class="task"><input id="t38" type="checkbox"><label for="t38"><b>Yanlış defteri</b><span>Haftanın bütün yanlışlarını kısa cevaplarla kapat.</span></label><span class="duration">45 dk</span></div>
+          </article>
+          <article class="day"><div class="day-head"><span class="day-name">Pazar</span><span class="day-date">1 Kasım</span></div>
+            <div class="task"><input id="t39" type="checkbox"><label for="t39"><b>9 derslik hızlı tur</b><span>Her dersten bir sayfa veya 10 dakikalık anlatım.</span></label><span class="duration">100 dk</span></div>
+            <div class="task"><input id="t40" type="checkbox"><label for="t40"><b>Eksik konu listesi</b><span>Son haftaya taşınacak en fazla 9 madde belirle.</span></label><span class="duration">30 dk</span></div>
+            <div class="task"><input id="t41" type="checkbox"><label for="t41"><b>Dinlenme</b><span>Yoğun son hafta öncesi akşamı boş bırak.</span></label><span class="duration">zorunlu</span></div>
+          </article>
+        </div>
+      </div>
+
+      <div class="week" data-panel="3">
+        <div class="week-intro"><div><strong>Sınav sırasına göre çalış</strong><span>2–6 Kasım’da sabit konuları kapat; 7–8 Kasım’ı ilk sınavlarına göre planla.</span></div><span>2–8 Kasım</span></div>
+        <section class="exam-schedule" aria-labelledby="sinav-baslik">
+          <h3 id="sinav-baslik">Sınav takvimi · tarihleri sen gir</h3>
+          <p>Kesin sınav tarihleri dosyada bulunmadığı için tarih eklenmedi. Tarihleri girdikçe 7–8 Kasım için en yakın sınavlar otomatik öne çıkar. Seçimler bu tarayıcıda saklanır; boş alanlar boş kalır.</p>
+          <div class="exam-grid" id="examGrid">
+            <label class="exam-field">VTYS<input type="date" data-exam="vtys" aria-label="VTYS sınav tarihi"></label>
+            <label class="exam-field">Dosya Organizasyonu<input type="date" data-exam="dosya" aria-label="Dosya Organizasyonu sınav tarihi"></label>
+            <label class="exam-field">İşletim Sistemleri<input type="date" data-exam="isletim" aria-label="İşletim Sistemleri sınav tarihi"></label>
+            <label class="exam-field">Kriptoloji<input type="date" data-exam="kripto" aria-label="Kriptoloji sınav tarihi"></label>
+            <label class="exam-field">EDT-Lab<input type="date" data-exam="edt" aria-label="EDT-Lab sınav tarihi"></label>
+            <label class="exam-field">C# Programlama<input type="date" data-exam="csharp" aria-label="C# Programlama sınav tarihi"></label>
+            <label class="exam-field">İnsan-Bilgisayar Etkileşimi<input type="date" data-exam="ibe" aria-label="İnsan-Bilgisayar Etkileşimi sınav tarihi"></label>
+            <label class="exam-field">Bilgi İşlem Organizasyonu<input type="date" data-exam="bio" aria-label="Bilgi İşlem Organizasyonu sınav tarihi"></label>
+            <label class="exam-field">Gömülü Sistem Tasarımı<input type="date" data-exam="gomulu" aria-label="Gömülü Sistem Tasarımı sınav tarihi"></label>
+          </div>
+        </section>
+        <div class="days">
+          <article class="day"><div class="day-head"><span class="day-name">Pazartesi</span><span class="day-date">2 Kasım</span></div>
+            <div class="task new-topic"><input id="t42" type="checkbox"><label for="t42"><b>Bugünün yeni dersi</b><span>Sınav kapsamına giriyorsa önceliklendir.</span></label><span class="duration">60 dk</span></div>
+            <div class="task"><input id="t43" type="checkbox"><label for="t43"><b>Dosya Organizasyonu · karma</b><span>Hafta 1'den yeni haftaya kadar kavram ve hesaplama.</span></label><span class="duration">90 dk</span></div>
+            <div class="task"><input id="t44" type="checkbox"><label for="t44"><b>İşletim Sistemleri · Bölüm 6–8 ve karma tekrar (kitap s. 257–346)</b><span>20 dk: kritik bölge, Peterson çözümü, mutex, semafor ve monitör kavramlarını karşılaştır; producer–consumer problemi için semaforların neyi koruduğunu açıkla (Bölüm 6–7). 15 dk: deadlock’un dört gerekli koşulunu yaz; önleme, kaçınma, tespit ve kurtarmayı ayır (Bölüm 8). 15 dk notsuz karma tur: Bölüm 1–8’den birer ana kavramı hatırlayıp 8 kısa soru yanıtla. 10 dk: kitap s. 287–288, 314–315 ve 344–345’teki alıştırmalardan seçtiklerini kontrol et ve yanlışları düzelt.</span></label><span class="duration">60 dk</span></div>
+          </article>
+          <article class="day"><div class="day-head"><span class="day-name">Salı</span><span class="day-date">3 Kasım</span></div>
+            <div class="task new-topic"><input id="t45" type="checkbox"><label for="t45"><b>C# · yeni hafta konusu</b><span>Yeni örneği çalıştır ve iki değişiklik yap.</span></label><span class="duration">60 dk</span></div>
+            <div class="task"><input id="t46" type="checkbox"><label for="t46"><b>C# · Hafta 5 ve sonrası</b><span>Dosya akışları, File/Directory/Path ve CSV.</span></label><span class="duration">90 dk</span></div>
+            <div class="task"><input id="t47" type="checkbox"><label for="t47"><b>C# · kodlama provası</b><span>Notlara bakmadan küçük konsol uygulaması yaz.</span></label><span class="duration">60 dk</span></div>
+          </article>
+          <article class="day"><div class="day-head"><span class="day-name">Çarşamba</span><span class="day-date">4 Kasım</span></div>
+            <div class="task new-topic"><input id="t48" type="checkbox"><label for="t48"><b>Bugünün yeni dersi</b><span>Tek sayfalık sınav özeti oluştur.</span></label><span class="duration">45 dk</span></div>
+            <div class="task"><input id="t49" type="checkbox"><label for="t49"><b>VTYS · Ders 5 · Tek tablolu sorgular, gruplandırma ve fonksiyonlar</b><span>20 dk: SELECT, WHERE, karşılaştırma ve mantıksal işleçler, LIKE, BETWEEN, IN, DISTINCT, AS, matematiksel ifadeler, NULL ve ORDER BY konularını çalış. 25 dk: SUM, AVG, MIN, MAX, COUNT ve LIMIT ile GROUP BY ve HAVING kullanımını; nümerik, metin, tarih ve CAST fonksiyonlarını incele. 35 dk: 5 filtreleme, 2 sıralama/DISTINCT, 3 toplulaştırma/gruplama ve 2 HAVING/fonksiyon sorgusu yazıp çalıştır. 10 dk: Ders 1–4 için 8 soruluk notsuz tur yap ve SQL hatalarını düzelt.</span></label><span class="duration">90 dk</span></div>
+            <div class="task"><input id="t50" type="checkbox"><label for="t50"><b>Kriptoloji · Karma deneme ve temel kriptanaliz</b><span>10 dk: K1–K6 için notları kapatıp Affine çözme formülünü, modüler ters koşulunu, Euler teoremini ve ilkel eleman ölçütünü hatırdan yaz. 40 dk: A=0…Z=25 ile Affine (5,11) anahtarında VSBICDODPB’yi çöz; Hill K=((11,8),(3,7)) için mod 26’da K⁻¹’i bul; 25⁵⁰ mod 144’ü, GF(2³)’te f=x³+x+1 için (x²+x)(x²+x+1)’i ve mod 7’de 3’ün mertebesini hesapla. 15 dk: K7 slayt 2–20’den yalnız şifreli/bilinen açık/seçilmiş açık metin saldırılarını örnekle ayır; 26 harfli, 5 karakterli anahtarda tekrar serbestken 26⁵ aday sayısını bul. Sunumun Türkçe alfabe sırasıyla AYŞE TATİLE ÇIKTI’yı k=5 ile yeniden şifrele, boşlukları çıkarıp frekansları say; en sık harfi A kabul eden anahtar adayını tüm metinde sınayarak kısa metin yanılgısını açıkla. 10 dk: çözümleri kaynaklarla karşılaştır, iki hatayı yeniden çöz ve nedenlerini not et.</span></label><span class="duration">75 dk</span></div>
+          </article>
+          <article class="day"><div class="day-head"><span class="day-name">Perşembe</span><span class="day-date">5 Kasım</span></div>
+            <div class="task new-topic"><input id="t51" type="checkbox"><label for="t51"><b>VTYS · Ders 6 · Çok tablolu ve alt sorgular</b><span>10 dk: kartezyen çarpımı, örtük birleştirme, INNER/OUTER/SELF JOIN ve eşiti olmayan birleştirmeyi karşılaştır. 20 dk: iki ve üç tabloluk 3 JOIN sorgusu ile bir UNION/UNION ALL örneği yaz. 15 dk: tek ve çok sonuçlu alt sorgularda IN, ANY, ALL ve EXISTS kullanarak 3 sorgu çöz.</span></label><span class="duration">45 dk</span></div>
+            <div class="task"><input id="t52" type="checkbox"><label for="t52"><b>EDT-Lab · uygulama provası</b><span>Baştan sona, yardım almadan tamamla.</span></label><span class="duration">90 dk</span></div>
+            <div class="task"><input id="t53" type="checkbox"><label for="t53"><b>İnsan-Bilgisayar Etkileşimi</b><span>Kavram kartları + örnek arayüz analizi.</span></label><span class="duration">60 dk</span></div>
+            <div class="task"><input id="t55" type="checkbox"><label for="t55"><b>VTYS · Ders 7 · Sorgu, view, indeks ve EXPLAIN</b><span>30 dk: sunumdaki film, uçuş ve ödünç örneklerinden 3 sorguyu JOIN ve alt sorgu yaklaşımlarıyla yeniden yaz. 20 dk: CREATE VIEW ile bir görünüm oluştur; basit görünümlerde hangi DML işlemlerinin yapılabildiğini açıkla. 25 dk: normal, UNIQUE ve çok sütunlu indeksler oluştur; FULLTEXT ve SPATIAL indekslerin kullanım alanlarını ayır. 15 dk: aynı sorguyu indeks öncesi ve sonrası EXPLAIN ile karşılaştır.</span></label><span class="duration">90 dk</span></div>
+          </article>
+          <article class="day"><div class="day-head"><span class="day-name">Cuma</span><span class="day-date">6 Kasım</span></div>
+            <div class="task"><input id="t54" type="checkbox"><label for="t54"><b>Bilgi İşlem Organizasyonu</b><span>Karma soru seti ve eksik konu dönüşü.</span></label><span class="duration">75 dk</span></div>
+            <div class="task"><input id="t64" type="checkbox"><label for="t64"><b>Gömülü Sistem Tasarımı · vize provası</b><span>Kavram, devre/şema ve kod sorularını süreli çöz.</span></label><span class="duration">75 dk</span></div>
+            <div class="task"><input id="t58" type="checkbox"><label for="t58"><b>VTYS · Ders 8 · Yönetim ve veri tabanı programlama</b><span>15 dk: CREATE/ALTER/DROP USER, GRANT, REVOKE ve rol atama için kısa bir yetki senaryosu yaz. 10 dk: autocommit, COMMIT, atomicity, isolation ve kayıt kilidini iki kullanıcılı senaryoyla açıkla. 25 dk: parametre alan bir saklı yordam, değer döndüren bir fonksiyon ve DML sonrası log yazan bir trigger taslağı oluştur. 10 dk: SHOW/USE komutları ile karakter seti ve collation değişikliğini tekrar et.</span></label><span class="duration">60 dk</span></div>
+            <div class="task"><input id="t56" type="checkbox"><label for="t56"><b>Özetleri sadeleştir</b><span>Her ders için tek sayfalık son tekrar kağıdı.</span></label><span class="duration">45 dk</span></div>
+          </article>
+          <article class="day weekend-flex" id="weekend-saturday">
+            <div class="day-head"><span class="day-name">Cumartesi · Esnek</span><span class="day-date">7 Kasım</span></div>
+            <p class="open-slot-note">Sabit ders atanmadı. Sınav sırasına göre çalışma konularını sen belirle; en yakın sınavlar aşağıda önerilir.</p>
+            <div id="saturdayPriorities" aria-live="polite"><p class="open-slot-note">Önce yukarıdan sınav tarihlerini ekle.</p></div>
+            <p class="weekend-footnote">Önerilen toplam: yaklaşık 225 dk esnek tekrar / deneme / yanlış analizi. Bu süreyi seçtiğin dersler arasında paylaş.</p>
+          </article>
+          <article class="day weekend-flex" id="weekend-sunday">
+            <div class="day-head"><span class="day-name">Pazar · Esnek</span><span class="day-date">8 Kasım</span></div>
+            <p class="open-slot-note">Özellikle ilk sınav(lar)a yönelik kısa, notsuz son tekrar. Yeni konu zorunluluğu yok.</p>
+            <div id="sundayPriorities" aria-live="polite"><p class="open-slot-note">Önce yukarıdan sınav tarihlerini ekle.</p></div>
+            <p class="weekend-footnote">Önerilen toplam: yaklaşık 90 dk tekrar + 20 dk sınav hazırlığı. Akşamı erken bitir.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="notes-wrap" aria-labelledby="notlar-baslik">
+      <div class="section-head"><div><h2 id="notlar-baslik">Hızlı notlar</h2><p>Eksik konu, sınav duyurusu veya GitHub'a yeni eklenen dosyaları buraya yaz.</p></div></div>
+      <textarea class="notes" id="notes" placeholder="Örnek: C# Hafta 6 eklendi — cuma günü tekrar edilecek…"></textarea>
+    </section>
+  </main>
+
+  <footer class="shell">Hafta içi konu çalışmaları sabittir; 7–8 Kasım son tekrarları girilen sınav tarihlerine göre esnektir. Notların ve işaretlerin yalnızca bu tarayıcıda saklanır.</footer>
+
+  <script>
+    const storageKey = 'vize-plani-2026';
+    const state = (() => { try { return JSON.parse(localStorage.getItem(storageKey) || '{}') || {}; } catch { return {}; } })();
+    const checks = [...document.querySelectorAll('input[type="checkbox"]')];
+    const tabs = [...document.querySelectorAll('.tab')];
+    const panels = [...document.querySelectorAll('.week')];
+    const examInputs = [...document.querySelectorAll('input[data-exam]')];
+    const examNames = {
+      vtys: 'VTYS', dosya: 'Dosya Organizasyonu', isletim: 'İşletim Sistemleri',
+      kripto: 'Kriptoloji', edt: 'EDT-Lab', csharp: 'C# Programlama',
+      ibe: 'İnsan-Bilgisayar Etkileşimi', bio: 'Bilgi İşlem Organizasyonu',
+      gomulu: 'Gömülü Sistem Tasarımı'
+    };
+
+    function updateWeekend() {
+      const exams = examInputs
+        .filter(input => input.value)
+        .map(input => ({name: examNames[input.dataset.exam], date: input.value}))
+        .sort((a, b) => a.date.localeCompare(b.date) || a.name.localeCompare(b.name, 'tr'));
+      for (const [id, target] of [['2026-11-07','saturdayPriorities'], ['2026-11-08','sundayPriorities']]) {
+        const container = document.getElementById(target);
+        const upcoming = exams.filter(item => item.date >= id);
+        container.replaceChildren();
+        if (!exams.length) {
+          const note = document.createElement('p');
+          note.className = 'open-slot-note';
+          note.textContent = 'Henüz sınav tarihi girilmedi. Bu gün serbest; tarih girersen öncelikler burada görünür.';
+          container.append(note);
+        } else if (!upcoming.length) {
+          const note = document.createElement('p');
+          note.className = 'open-slot-note';
+          note.textContent = 'Girilen sınavların tamamı bu tarihten önce. Bu günü serbest bırakabilir veya eksik tekrarı yapabilirsin.';
+          container.append(note);
+        } else {
+          const lead = document.createElement('p');
+          lead.className = 'open-slot-note';
+          lead.textContent = 'Yaklaşan sınav sırasına göre öncelik (otomatik):';
+          container.append(lead);
+          const list = document.createElement('ol');
+          list.className = 'priority-output';
+          for (const item of upcoming.slice(0, 3)) {
+            const li = document.createElement('li');
+            const strong = document.createElement('strong');
+            strong.textContent = item.name;
+            const small = document.createElement('small');
+            const date = new Date(item.date + 'T12:00:00');
+            small.textContent = date.toLocaleDateString('tr-TR', {day:'numeric',month:'long',year:'numeric'});
+            li.append(strong, small);
+            list.append(li);
+          }
+          container.append(list);
+          if (upcoming.length > 3) {
+            const more = document.createElement('p');
+            more.className = 'open-slot-note';
+            more.textContent = 'Diğer sınavlar takvimde kayıtlı; en yakın üç sınav gösteriliyor.';
+            container.append(more);
+          }
+        }
+      }
+    }
+
+    function save() {
+      state.checked = Object.fromEntries(checks.map(box => [box.id, box.checked]));
+      state.notes = document.querySelector('#notes').value;
+      state.exams = Object.fromEntries(examInputs.map(input => [input.dataset.exam, input.value]));
+      try { localStorage.setItem(storageKey, JSON.stringify(state)); } catch { /* Özel gezinme veya depolama kısıtlaması varsa çalışma devam eder. */ }
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const completed = checks.filter(box => box.checked).length;
+      const percent = Math.round((completed / checks.length) * 100);
+      document.querySelector('#progressValue').textContent = percent;
+      document.querySelector('#progressBar').style.width = percent + '%';
+      document.querySelector('#progressText').textContent = completed
+        ? `${checks.length} görevin ${completed} tanesi tamamlandı.`
+        : 'Henüz görev tamamlanmadı.';
+      checks.forEach(box => box.closest('.task').classList.toggle('done', box.checked));
+    }
+
+    checks.forEach(box => {
+      box.checked = Boolean(state.checked && state.checked[box.id]);
+      box.addEventListener('change', save);
+    });
+    const notes = document.querySelector('#notes');
+    notes.value = state.notes || '';
+    notes.addEventListener('input', save);
+
+    examInputs.forEach(input => {
+      input.value = (state.exams && state.exams[input.dataset.exam]) || '';
+      input.addEventListener('change', () => { updateWeekend(); save(); });
+    });
+    updateWeekend();
+
+    tabs.forEach(tab => tab.addEventListener('click', () => {
+      tabs.forEach(item => item.classList.toggle('active', item === tab));
+      panels.forEach(panel => panel.classList.toggle('active', panel.dataset.panel === tab.dataset.week));
+    }));
+
+    document.querySelector('#printBtn').addEventListener('click', () => window.print());
+    document.querySelector('#resetBtn').addEventListener('click', () => {
+      if (!confirm('Tamamlanan görev işaretleri sıfırlansın mı? Notların korunacak.')) return;
+      checks.forEach(box => box.checked = false);
+      save();
+    });
+
+    updateProgress();
+    if ('serviceWorker' in navigator && location.protocol === 'https:') {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
